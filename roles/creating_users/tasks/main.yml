@@ -1,0 +1,13 @@
+---
+- name: Is host active?
+  ping:
+  tags:
+    - "tests"
+    - "all"
+- name: Create_user
+  include_tasks: create_user.yml
+  when: '"{{ DELETE_USER }}" != "true"'
+
+- name: Delete user
+  include_tasks: delete_user.yml
+  when: '"{{ DELETE_USER }}" == "true"'  

@@ -1,0 +1,13 @@
+- name: Delete droplet
+  digital_ocean:
+    state: deleted
+    id: "{{ DROPLET_ID }}"
+    api_token: "{{ DIGITALOCEAN_TOKEN }}"
+    region_id: fra1
+    size_id: 1gb
+    image_id: ubuntu-20-04-x64
+    command: droplet
+    name: "{{ DROPLET_NAME }}"
+    wait_timeout: 500
+    unique_name: yes
+
