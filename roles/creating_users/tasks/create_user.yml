@@ -1,0 +1,29 @@
+- name: Creating user
+  user:
+    name: "{{ USER_NAME }}"
+    shell: /bin/sh
+    generate_ssh_key: yes
+    ssh_key_bits: 4096
+    ssh_key_file: ".ssh/{{ USER_NAME }}_rsa"
+    #group: andron
+
+- name: "Copy ssh key for user {{ USER_NAME }}"
+  fetch:
+    src: "/home/{{ USER_NAME }}/.ssh/{{ item }}"
+    dest: "./.ssh/{{ item }}"
+    flat: yes
+  loop:
+    - "{{ USER_NAME}}_rsa"
+    - "{{ USER_NAME}}_rsa.pub"
+
+- name: "Added key for user {{ USER_NAME }} to server access"
+  authorized_key:
+    user: "{{ USER_NAME }}"
+    state: present
+    key: "{{ lookup('file', '.ssh/{{ USER_NAME }}_rsa.pub') }}"
+
+- name: Change perrmitions for private key
+  file:
+    path: ".ssh/{{ USER_NAME }}_rsa"
+    mode: 600
+  delegate_to: localhost

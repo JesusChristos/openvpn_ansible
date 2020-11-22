@@ -1,0 +1,5 @@
+---
+DIGITALOCEAN_TOKEN: null!
+DROPLET_NAME: TestPidar
+DELETE_DROPLET: false
+DROPLET_ID: null!
