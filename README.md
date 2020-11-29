@@ -18,3 +18,5 @@ ansible-playbook -i hosts playbook (якщо треба викликати дл�
 # Киклик ad-hoc команди
 
 ansible -m ping -i hosts all (якщо для конкретного сервера "192.168.1.1,")
+
+pip3 install -r requirements.txt

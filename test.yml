@@ -1,0 +1,11 @@
+- name: Generation MD5
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: geting ..
+      shell: "ssh-keygen -E md5 -lf .ssh/TestPidar.pub | cut -c 7-"
+      register: SS
+      
+
+    - debug:
+        msg: "{{ SS.stdout }}"
