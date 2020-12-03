@@ -4,29 +4,19 @@
     state: directory
 
 - name: Generate an OpenSSH rsa keypair with a different size (4096 bits)
-  openssh_keypair:                                                                          #https://docs.ansible.com/ansible/latest/collections/community/crypto/openssh_keypair_module.html
-    path: "./.ssh/{{ DROPLET_NAME }}" 
+  openssl_privatekey:                                                                          #https://docs.ansible.com/ansible/2.5/modules/openssl_privatekey_module.html more relaible module
+    path: "./.ssh/{{ DROPLET_NAME }}.pem" 
     size: 4096
     mode: '600'
+    type: DSA
+  register: md5-key
 
-- name: ensure ssh key exists
-  user: 
-    name: "{{ DROPLET_NAME }}"
-    generate_ssh_key: yes
-    ssh_key_file: "./.ssh/{{ DROPLET_NAME }}"
-    
-- name: Ensure a SSH key is present
-  community.digitalocean.digital_ocean:                                                     #https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_module.html
-    state: present
-    command: ssh
-    name: "{{ DROPLET_NAME }}"
-    ssh_pub_key: "{{ lookup('file', './.ssh/{{ DROPLET_NAME }}.pub') }}"
-    api_token: "{{ DIGITALOCEAN_TOKEN }}"
-
-- name: Generation MD5 for ssh key
-  shell: "ssh-keygen -E md5 -lf .ssh/TestPidar.pub | cut -c 7- | cut -c -50"                #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
-  register: generation_md5 
-
+- name: "Getting md5 fingerprint for {{ DROPLET_NAME }}"
+  set_fact:
+    generation_md5: "{{ item.value }}"
+  loop: "{{ lookup('dict', md5-key.fingerprint }}"
+  when: "'md5' in item.key"
+  
 - name: Create new droplet Digital Ocean
   digital_ocean:                                                                            #https://docs.ansible.com/ansible/2.9/modules/digital_ocean_module.html
     state: present
