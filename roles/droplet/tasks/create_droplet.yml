@@ -9,12 +9,12 @@
     size: 4096
     mode: '600'
     type: DSA
-  register: md5-key
+  register: md5_key
 
 - name: "Getting md5 fingerprint for {{ DROPLET_NAME }}"
   set_fact:
     generation_md5: "{{ item.value }}"
-  loop: "{{ lookup('dict', md5-key.fingerprint }}"
+  loop: "{{ lookup('dict', md5_key.fingerprint }}"
   when: "'md5' in item.key"
   
 - name: Create new droplet Digital Ocean
