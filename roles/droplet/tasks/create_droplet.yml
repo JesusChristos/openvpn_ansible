@@ -16,12 +16,16 @@
     generation_md5: "{{ item.value }}"
   loop: "{{ lookup('dict', md5_key.fingerprint) }}"
   when: "'md5' in item.key"
-  
+
+- name: Create pub key
+  shell: |
+    ssh-keygen -f ./.ssh/{{ DROPLET_NAME }}.pem -y > ./.ssh/{{ DROPLET_NAME }}.pub
+
 - name: "Pull ssh key for {{ DROPLET_NAME }}"
   digital_ocean_sshkey:
     oauth_token: "{{ DIGITALOCEAN_TOKEN }}"
     name: "{{ DROPLET_NAME }}_key"
-    fingerprint: "{{ generation_md5 }}"
+    ssh_pub_key: "./.ssh/{{ DROPLET_NAME }}.pub"
     state: present
 
 - name: Create new droplet Digital Ocean
