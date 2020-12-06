@@ -6,7 +6,7 @@
 - name: Generate an OpenSSH rsa keypair with a different size (4096 bits)
   openssl_privatekey:                                                                          #https://docs.ansible.com/ansible/2.5/modules/openssl_privatekey_module.html more relaible module
     path: "./.ssh/{{ DROPLET_NAME }}.pem" 
-    size: 4096
+    size: 2048
     mode: '600'
     type: DSA
   register: md5_key
