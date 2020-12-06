@@ -1,2 +1,2 @@
----
-# tasks file for provision
+sudo apt update && sudo apt upgrade -y
+dpkg reconfigure-tzdata
