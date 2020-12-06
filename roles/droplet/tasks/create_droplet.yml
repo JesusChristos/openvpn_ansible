@@ -11,6 +11,19 @@
     type: DSA
   register: md5_key
 
+- name: "Getting md5 fingerprint for {{ DROPLET_NAME }}"
+  set_fact:
+    generation_md5: "{{ item.value }}"
+  loop: "{{ lookup('dict', md5_key.fingerprint) }}"
+  when: "'md5' in item.key"
+  
+- name: "Pull ssh key for {{ DROPLET_NAME }}"
+  digital_ocean_sshkey:
+    oauth_token: "{{ DIGITALOCEAN_TOKEN }}"
+    name: "{{ DROPLET_NAME }}_key"
+    fingerprint: "{{ generation_md5 }}"
+    state: present
+
 - name: Create new droplet Digital Ocean
   digital_ocean:                                                                            #https://docs.ansible.com/ansible/2.9/modules/digital_ocean_module.html
     state: present
@@ -22,9 +35,7 @@
     image_id: ubuntu-20-04-x64
     wait_timeout: 500
     unique_name: yes
-    ssh_key_ids: "{{ item.value }}"
-  loop: "{{ lookup('dict', md5_key.fingerprint) }}"
-  when: "'md5' in item.key"
+    ssh_key_ids: "{{ generation_md5 }}"
   register: my_droplet
   
 

@@ -1,5 +1,5 @@
 ---
 DIGITALOCEAN_TOKEN: null!
-DROPLET_NAME: TestPidar
+DROPLET_NAME: null!
 DELETE_DROPLET: false
 DROPLET_ID: null!

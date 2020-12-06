@@ -2,10 +2,19 @@
   hosts: all
   gather_facts: false
   tasks:
-    - name: geting ..
-      shell: "ssh-keygen -E md5 -lf .ssh/TestPidar.pub | cut -c 7-"
-      register: SS
-      
+    - name: Generate an OpenSSH rsa keypair with a different size (4096 bits)
+      openssl_privatekey:                                                                          #https://docs.ansible.com/ansible/2.5/modules/openssl_privatekey_module.html more relaible module
+        path: "test.pem" 
+        size: 2048
+        mode: '600'
+        type: DSA
+      register: md5_key
+
+    - name: "Getting md5 fingerprint for {{ DROPLET_NAME }}"
+      set_fact:
+        generation_md5: "{{ item.value }}"
+      loop: "{{ lookup('dict', md5_key.fingerprint) }}"
+      when: "'md5' in item.key"
 
     - debug:
-        msg: "{{ SS.stdout }}"
+        msg: "{{ generation_md5 }}"
