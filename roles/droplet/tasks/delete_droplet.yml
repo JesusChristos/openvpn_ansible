@@ -1,3 +1,9 @@
+- name: Delete SSH key
+  digital_ocean_sshkey:                                                     #https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_module.html
+    state: absent
+    fingerprint: "{{ DROPLET_FINGERPRINT }}"
+    oauth_token: "{{ DIGITALOCEAN_TOKEN }}"
+
 - name: Delete droplet
   digital_ocean:
     state: deleted

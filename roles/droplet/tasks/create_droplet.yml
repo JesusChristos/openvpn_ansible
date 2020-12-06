@@ -50,7 +50,8 @@
 
 - name: Write ip and id of droplet
   copy:
-    dest: "./{{ DROPLET_NAME }}"
+    dest: "./{{ DROPLET_NAME }}.yml"
     content: |
-      "ID is {{ my_droplet.droplet.id }}"
-      "IP is {{ my_droplet.droplet.ip_address }}"
+      "DROPLET_ID: {{ my_droplet.droplet.id }}"
+      "IP: {{ my_droplet.droplet.ip_address }}"
+      "DROPLET_FINGERPRINT: {{ generation_md5.stdout }}"
