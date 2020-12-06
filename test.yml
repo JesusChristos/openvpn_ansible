@@ -2,10 +2,9 @@
   hosts: all
   gather_facts: false
   tasks:
-    - name: geting ..
-      shell: "ssh-keygen -E md5 -lf .ssh/TestPidar.pub | cut -c 7-"
-      register: SS
-      
+    - name: Generation MD5 for ssh key
+      shell: "ssh-keygen -E md5 -lf .ssh/TestPidor.pub | cut -c 10- | cut -c -47"                #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.htm/l
+      register: generation_md5
 
     - debug:
-        msg: "{{ SS.stdout }}"
+        msg: "{{ generation_md5.stdout }}"

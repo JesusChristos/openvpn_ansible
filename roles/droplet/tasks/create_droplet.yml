@@ -24,7 +24,7 @@
     api_token: "{{ DIGITALOCEAN_TOKEN }}"
 
 - name: Generation MD5 for ssh key
-  shell: "ssh-keygen -E md5 -lf .ssh/TestPidar.pub | cut -c 7- | cut -c -50"                #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  shell: "ssh-keygen -E md5 -lf .ssh/{{ DROPLET_NAME }}.pub | cut -c 10- | cut -c -47"                #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
   register: generation_md5 
 
 - name: Create new droplet Digital Ocean
@@ -38,7 +38,7 @@
     image_id: ubuntu-20-04-x64
     wait_timeout: 500
     unique_name: yes
-    ssh_key_ids: "{{ generation_md5 }}"
+    ssh_key_ids: "{{ generation_md5.stdout }}"
   register: my_droplet
   
 
