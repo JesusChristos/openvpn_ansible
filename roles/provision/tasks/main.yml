@@ -1,2 +1,0 @@
-sudo apt update && sudo apt upgrade -y | apt install wireguard net-tools
-dpkg reconfigure-tzdata
