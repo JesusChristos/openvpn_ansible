@@ -1,0 +1,4 @@
+- name: Get template
+  template:
+    src: server.conf.j2
+    dest: /tmp/server.conf

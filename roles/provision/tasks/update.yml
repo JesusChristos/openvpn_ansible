@@ -3,7 +3,19 @@
     state: latest                                                                            
     update_cache: yes
     force_apt_get: yes
-    cache_valid_time: 3600                           
+    cache_valid_time: 3600
+
+- name: Install packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - openvpn
+    - easy-rsa
+  register: test
+
+- debug:
+    msg: "{{ test }}"                   
 
 #- name: Upgrade all packages on VM
 #  apt: 
