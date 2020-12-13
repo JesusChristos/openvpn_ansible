@@ -1,10 +1,10 @@
 - name: Create folder
-  file:
+  file:                                                                                   #https://docs.ansible.com/ansible/2.9/modules/file_module.html
     path: ./.ssh
     state: directory
 
 - name: Generate an OpenSSH rsa keypair with a different size (4096 bits)
-  openssh_keypair:                                                                          #https://docs.ansible.com/ansible/latest/collections/community/crypto/openssh_keypair_module.html
+  openssh_keypair:                                                                        #https://docs.ansible.com/ansible/latest/collections/community/crypto/openssh_keypair_module.html
     path: "./.ssh/{{ DROPLET_NAME }}" 
     size: 4096
     mode: '600'
@@ -24,7 +24,7 @@
     api_token: "{{ DIGITALOCEAN_TOKEN }}"
 
 - name: Generation MD5 for ssh key
-  shell: "ssh-keygen -E md5 -lf .ssh/{{ DROPLET_NAME }}.pub | cut -c 10- | cut -c -47"                #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  shell: "ssh-keygen -E md5 -lf .ssh/{{ DROPLET_NAME }}.pub | cut -c 10- | cut -c -47"      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
   register: generation_md5 
 
 - name: Create new droplet Digital Ocean
