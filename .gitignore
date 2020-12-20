@@ -6,3 +6,4 @@ dep.yml
 *.log
 .vagrant
 TestPidor
+OpenVPN

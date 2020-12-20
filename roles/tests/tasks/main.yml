@@ -1,4 +1,39 @@
+- name: Update apt repo and cache on Ubuntu VM
+  apt:                                                                                              #https://docs.ansible.com/ansible/2.9/modules/apt_module.html
+    state: latest                                                                            
+    update_cache: yes
+    force_apt_get: yes
+    cache_valid_time: 3600
+
+- name: Install packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - openvpn
+    - easy-rsa
+  register: test
+
+- name: Create dirs and links
+  file:
+    path: "~/{{ item }}"
+    state: directory
+  loop:
+    - "{{ CERT_ROOT_DIR }}"
+
 - name: Get template
   template:
-    src: server.conf.j2
-    dest: /tmp/server.conf
+    src: "{{ item.name }}.j2" 
+    dest: "{{ item.path }}"
+  loop:
+    - { name: "server.conf", path: "/etc/openvpn/server.conf" }
+    - { name: "vars", path: "~/{{ CERT_ROOT_DIR }}/vars"}
+
+
+- name: Close init easy_rsa
+  command: "{{ item }}"
+  loop:
+    - "EASYRSA_BATCH=1 /usr/share/easy-rsa/easyrsa init-pki"
+    - "/usr/share/easy-rsa/easyrsa build-ca nopass"
+  args:
+    chdir: "~/{{ CERT_ROOT_DIR }}"
