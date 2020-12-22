@@ -16,7 +16,7 @@
     ssh_key_file: "./.ssh/{{ DROPLET_NAME }}"
     
 - name: Ensure a SSH key is present
-  community.digitalocean.digital_ocean:                                                     #https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_module.html
+  digital_ocean:                                                     #https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_module.html
     state: present
     command: ssh
     name: "{{ DROPLET_NAME }}"
