@@ -1,4 +1,3 @@
-TestPidor
 *Pidor
 .ssh
 .ssh/*
@@ -6,4 +5,4 @@ dep.yml
 *.log
 .vagrant
 TestPidor
-OpenVPN
+OpenVPN.yml
