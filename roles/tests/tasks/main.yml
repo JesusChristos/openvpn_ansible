@@ -91,7 +91,7 @@
 #  args:
 #    chdir: "~/{{ CERT_ROOT_DIR }}"
 
-#- name: Copy DH to /etc/openvpn
+#- name: Copy TA to /etc/openvpn
 #  copy:
 #    src: "~/{{ CERT_ROOT_DIR }}/ta.key"
 #    dest: "/etc/openvpn/ta.key"
@@ -118,14 +118,61 @@
 #    -A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE' /etc/ufw/before.rules
 
 
-- name: Allow OpenSSH rule
-  ufw:
-    state: enabled
-    rule: allow
-    name: OpenSSH
+#- name: Allow OpenSSH rule
+#  ufw:
+#    state: enabled
+#    rule: allow
+#    name: OpenSSH
 
-- name: Allow OpeVPN rule
-  ufw:
-    rule: allow
-    port: openvpn
-    
+#- name: Allow OpeVPN rule
+#  ufw:
+#    rule: allow
+#    port: openvpn
+
+#- name: Reloaded systemd / Restarted OpenVPN service
+#  systemd:
+#    daemon_reload: yes
+#    name: openvpn 
+#    state: restarted
+
+#- name: Reloaded systemd
+#  systemd:
+#    name: openvpn 
+#    state: started
+
+
+#- name: "Build Gen-Reg client"
+#  become: yes
+#  shell: >
+#    yes "" | /usr/share/easy-rsa/easyrsa gen-req client nopass;
+#  args: 
+#    chdir: "~/{{ CERT_ROOT_DIR }}"
+#    executable: /bin/bash
+
+#- name: Copy client key to /etc/openvpn
+#  copy:
+#    src: "~/{{ CERT_ROOT_DIR }}/pki/private/client.key"
+#    dest: "/etc/openvpn/client/client.key"
+#    remote_src: yes
+
+#- name: "Build the client.crt"
+#  become: yes
+#  shell: |
+#    bash << EOF
+#    /usr/share/easy-rsa/easyrsa sign-req client client
+#    yes
+#    EOF
+#  args: 
+#    chdir: "~/{{ CERT_ROOT_DIR }}"
+#    executable: /bin/bash
+
+#- name: Copy client key to /etc/openvpn
+#  copy:
+#    src: "~/{{ CERT_ROOT_DIR }}/pki/issued/client.crt"
+#    dest: "/etc/openvpn/client/client.crt"
+#    remote_src: yes
+
+
+
+
+
