@@ -112,8 +112,20 @@
 #    regexp: '^DEFAULT_FORWARD_POLICY="DROP"'
 #    line: DEFAULT_FORWARD_POLICY="ACCEPT"
 
-- name: Added rules Firewall
-  shell: >
-    sed -i '18i
-    -A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE' /etc/ufw/before.rules
+#- name: Added rules Firewall
+#  shell: >
+#    sed -i '18i
+#    -A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE' /etc/ufw/before.rules
+
+
+- name: Allow OpenSSH rule
+  ufw:
+    state: enabled
+    rule: allow
+    name: OpenSSH
+
+- name: Allow OpeVPN rule
+  ufw:
+    rule: allow
+    port: openvpn
     
