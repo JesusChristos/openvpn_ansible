@@ -6,14 +6,11 @@ ca {{ CA_CERT }}
 cert {{ SERVER_CERT }}
 key {{ SERVER_KEY }} 
 tls-auth {{ TLS_AUTH }}
-
 dh {{ DH_CERT }}
 
 server {{ INTERNAL_SUBNET }}
-
 ifconfig-pool-persist {{ CONNECTED_CLIENT_FILE }}
 push {{ PUSH_EXTRA_CONFIG }}
-
 push {{ PUSH_EXTRA_DNS_1 }}
 push {{ PUSH_EXTRA_DNS_2 }}
 keepalive {{ KEEPALIVE }}

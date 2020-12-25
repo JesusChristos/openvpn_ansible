@@ -1,2 +1,30 @@
-{% for key, value in client_config.iteritems() -%}
-{%- endfor %}
+
+client
+dev {{ CLIENT_CONNECTION_INTERFACE }}
+proto {{ CLIENT_CONNECTION_PROTOCOL }}
+remote {{ CLIENT_REMOTE_CONNECTION_SERVER }} {{ CLIENT_CONNETCTION_PORT }}
+resolv-retry infinite
+nobind
+user {{ CLIENT_OPENVPN_USER }}
+group {{ CLIENT_OPENVPN_GROUP }}
+persist-key
+persist-tun
+remote-cert-tls server
+cipher {{ CHIPER }}
+verb 3
+
+<ca>
+</ca>
+
+<cert>
+</cert>
+
+<key>
+</key>
+
+<tls-auth>
+</tls-auth>
+
+
+
+
