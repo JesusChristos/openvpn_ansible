@@ -10,8 +10,8 @@ group {{ CLIENT_OPENVPN_GROUP }}
 persist-key
 persist-tun
 remote-cert-tls server
-cipher {{ CHIPER }}
-verb 3
+cipher {{ CLIENT_CHIPER }}
+verb {{ CLIENT_OPENVPN_VERB_LEVEL }}
 
 <ca>
 </ca>
