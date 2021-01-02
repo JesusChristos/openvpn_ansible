@@ -132,7 +132,7 @@
     regexp: '^DEFAULT_FORWARD_POLICY="DROP"'
     line: DEFAULT_FORWARD_POLICY="ACCEPT"
 
-- name: Added rules Firewall                                                 #Переробити нормально!
+- name: Added rules Firewall                                                 
   shell: |
     ed /etc/ufw/before.rules << END
     18i
