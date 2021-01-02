@@ -133,10 +133,16 @@
     line: DEFAULT_FORWARD_POLICY="ACCEPT"
 
 - name: Added rules Firewall                                                 #Переробити нормально!
-  shell: >
-    sed -i '18i
-    -A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE' /etc/ufw/before.rules
-
+  shell: |
+    ed /etc/ufw/before.rules << END
+    18i
+    *nat
+    :POSTROUTING ACCEPT [0:0]
+    -A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE
+    .
+    w
+    q
+    END
 
 - name: Reloaded systemd / Restarted OpenVPN service
   systemd:

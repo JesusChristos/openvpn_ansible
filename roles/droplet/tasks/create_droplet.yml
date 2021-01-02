@@ -56,4 +56,4 @@
       "IP: {{ my_droplet.droplet.ip_address }}"
       "DROPLET_FINGERPRINT: {{ generation_md5.stdout }}"
 
-- name: List Droplet
+#- name: List Droplet
