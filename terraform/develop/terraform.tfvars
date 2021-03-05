@@ -1,5 +1,5 @@
 #Main account config variables
-account_token   = null
+account_token   = "a67d7800074913000da6818cd2c508c382c6b379103511cb6e229d6688befb8e"
 
 # Droplet config variables
 region             = "fra1"
