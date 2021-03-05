@@ -1,0 +1,71 @@
+---
+- name: Simple user creation      # Назва функції (назва playbook) 
+  hosts: all                      # Вибірка хостів (файл hosts)
+  become: true                    # Права root
+  gather_facts: false             # Збір інформації про сервер
+  vars:                           # Змінанна
+   - DELETE_USER: false
+  tasks:                          # Блок таксків
+
+    - name: Is host active?       # Назва такски
+      ping:                       # Модуль
+      tags:                       # Тег по запуску (default all) # https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html
+        - "tests"
+        - "all"
+    
+    - name: Creating user
+      user:
+        name: "{{ USER_NAME }}"
+        shell: /bin/sh
+        generate_ssh_key: yes
+        ssh_key_bits: 4096
+        ssh_key_file: ".ssh/{{ USER_NAME }}_rsa"
+        #group: andron
+      when: '"{{ DELETE_USER }}" != "true"'                                     # Це аналог IF-ELSE 
+  
+    - name: "Copy ssh key for user {{ USER_NAME }}"
+      fetch:                                                                    # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/fetch_module.html
+        src: "/home/{{ USER_NAME }}/.ssh/{{ item }}"
+        dest: "./.ssh/{{ item }}"                                               # Це аналог whele (Поки не пройде всі змінні, доти воно буде виконуватись)
+        flat: yes
+      loop:                                                                     # Це перше значення loop # https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html
+        - "{{ USER_NAME }}_rsa"
+        - "{{ USER_NAME }}_rsa.pub"
+      when: '"{{ DELETE_USER }}" != "true"'                                     # https://docs.ansible.com/ansible/latest/user_guide/playbooks_conditionals.html
+
+    - name: "Added key for user {{ USER_NAME }} to server access"
+      authorized_key:                                                           # https://docs.ansible.com/ansible/latest/collections/ansible/posix/authorized_key_module.html
+        user: "{{ USER_NAME }}"                                                 
+        state: present
+        key: "{{ lookup('file', '.ssh/{{ USER_NAME }}_rsa.pub') }}"
+      when: '"{{ DELETE_USER }}" != "true"'
+
+    - name: Change perrmitions for private key
+      file:                                                                     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html
+        path: ".ssh/{{ USER_NAME }}_rsa"
+        mode: 600
+      delegate_to: localhost
+      when: '"{{ DELETE_USER }}" != "true"'
+
+    - name: Deleting user
+      user:                                                                     # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html
+       name: "{{ USER_NAME }}"
+       state: absent
+      when: '"{{ DELETE_USER }}" == "true"'
+
+    - name: Deleting user home dir
+      file:
+        path: "/home/{{ USER_NAME }}"
+        state: absent
+      when: '"{{ DELETE_USER }}" == "true"'
+    
+    - name: "Deleting old keys on local machine"
+      file:
+        path: ".ssh/{{ item }}"
+        state: absent
+      delegate_to: localhost                                                    # Який хост буде виконуватися (в нашому значенні це localhost) # https://docs.ansible.com/ansible/latest/user_guide/playbooks_delegation.html
+      loop:
+        - "{{ USER_NAME }}_rsa"
+        - "{{ USER_NAME }}_rsa.pub"
+      when: '"{{ DELETE_USER }}" == "true"'  
+...

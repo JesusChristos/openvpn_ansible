@@ -1,0 +1,31 @@
+---
+#- name: "Build Gen-Reg client"
+#  become: yes
+#  shell: >
+#    yes "" | /usr/share/easy-rsa/easyrsa gen-req client nopass;
+#  args: 
+#    chdir: "~/{{ CERT_ROOT_DIR }}"
+#    executable: /bin/bash
+
+#- name: Copy client key to /etc/openvpn
+#  copy:
+#    src: "~/{{ CERT_ROOT_DIR }}/pki/private/client.key"
+#    dest: "/etc/openvpn/client/client.key"
+#    remote_src: yes
+
+#- name: "Build the client.crt"
+#  become: yes
+#  shell: |
+#    bash << EOF
+#    /usr/share/easy-rsa/easyrsa sign-req client client
+#    yes
+#    EOF
+#  args: 
+#    chdir: "~/{{ CERT_ROOT_DIR }}"
+#    executable: /bin/bash
+
+#- name: Copy client key to /etc/openvpn
+#  copy:
+#    src: "~/{{ CERT_ROOT_DIR }}/pki/issued/client.crt"
+#    dest: "/etc/openvpn/client/client.crt"
+#    remote_src: yes

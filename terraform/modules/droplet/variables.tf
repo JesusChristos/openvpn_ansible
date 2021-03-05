@@ -22,6 +22,21 @@ variable "droplet_size" {
     default = "s-1vcpu-1gb"
 }
 
-variable "ssh_keys" {
-    default = "../module/master-ke"
+# Droplet SSH config variables
+variable "algorithm" {
+    type    = string
+    default = "RSA"
+}
+variable "rsa_bits" {
+    type    = string
+    default = 4096
+}
+
+variable "file_permission" {
+    type    = number
+    default = 0600
+}
+variable "filename" {
+    type    = string
+    default = "master_key"
 }
