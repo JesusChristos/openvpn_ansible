@@ -14,8 +14,27 @@
     state: present
   loop:
     - openvpn
-    - easy-rsa
+    - mc
+    - htop
   register: test
+
+- name: Create a directory easy-rsa
+  file:
+    path: "{{ PATH_EASY_RSA }}"
+    state: directory
+    mode: '0755'
+
+- name: Download EasyRSA-3.0.4
+  get_url:
+    url: https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.4/EasyRSA-3.0.4.tgz
+    dest: "{{ PATH_EASY_RSA }}"
+
+
+- name: Extract EasyRSA into PATH_EASY_RSA
+  unarchive:
+    src: "{{ PATH_EASY_RSA }}/EasyRSA-3.0.4.tgz"
+    dest: "{{ PATH_EASY_RSA }}"
+    remote_src: yes
 
 - name: Create dirs and links
   file:
@@ -32,23 +51,22 @@
     - { name: "server.conf", path: "/etc/openvpn/server.conf" }
     - { name: "vars", path: "~/{{ CERT_ROOT_DIR }}/vars"}
 
-
 - name: Build PKI
-  command: "/usr/share/easy-rsa/easyrsa init-pki"
+  command: "/usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa init-pki"
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
 - name: "Build the CA"
   become: yes
   shell: >
-    yes "" | /usr/share/easy-rsa/easyrsa build-ca nopass;
+    yes "" | /usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa build-ca nopass;
   args: 
     chdir: "~/{{ CERT_ROOT_DIR }}"
     executable: /bin/bash
 
 - name: Build Gen-Reg
   shell: > 
-    yes "" | /usr/share/easy-rsa/easyrsa gen-req server nopass
+    yes "" | /usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa gen-req server nopass
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
@@ -62,7 +80,7 @@
   become: yes
   shell: |
     bash << EOF
-    /usr/share/easy-rsa/easyrsa sign-req server server
+    /usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa sign-req server server
     yes
     EOF
   args: 
@@ -79,7 +97,7 @@
     - { name: "ca.crt", path: "pki"}
     
 - name: Build DH
-  command: "/usr/share/easy-rsa/easyrsa gen-dh"
+  command: "/usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa gen-dh"
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 

@@ -21,3 +21,4 @@ OPENVPN_LOG: /var/log/openvpn/openvpn.log
 OPENVPN_VERB_LEVEL: 3
 EXPLICIT_EXIT_NOTIFY: 1
 CERT_ROOT_DIR: certificate_authority
+PATH_EASY_RSA: /usr/share/easy-rsa

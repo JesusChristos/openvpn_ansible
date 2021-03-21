@@ -40,3 +40,8 @@ variable "filename" {
     type    = string
     default = "master_key"
 }
+
+variable "master_ip" {
+  type      =   string
+  default   = "master_ip"
+}

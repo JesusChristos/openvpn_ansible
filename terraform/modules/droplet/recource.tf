@@ -43,6 +43,6 @@ resource "local_file" "private_key" {
 #Write Droplet_IP to localfile
 resource "local_file" "ipv4_address" {
     content         = "${digitalocean_droplet.openvpn_master.ipv4_address}"
-    filename        = "${path.module}.${var.filename}ip.txt"
+    filename        = "${path.module}.${var.master_ip}.txt"
     file_permission = var.file_permission
 }
