@@ -1,11 +1,19 @@
----
-# tasks file for openvpn
-- name: Build PKI
-  command: "/etc/openvpn/easyrsa init-pki"
-  args:
-    chdir: "~/{{ CERT_ROOT_DIR }}"
+- name: Allow OpenSSH rule
+  ufw:
+    rule: allow
+    name: OpenSSH
 
+- name: Allow OpenVPN rule
+  ufw:
+    rule: allow
+    port: openvpn
 
+- name: Allow everything and enable UFW
+  ufw:
+    state: enabled
+    policy: allow
 
-#- debug:
-#    msg: "{{ this }}"
+- name: Added rules Firewall                                                 #Переробити нормально!
+  shell: iptables -I FORWARD -i tun0 -o eth0 -j ACCEPT &&
+          iptables -I FORWARD -i eth0 -o tun0 -j ACCEPT &&
+          iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE

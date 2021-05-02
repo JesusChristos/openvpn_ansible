@@ -2,14 +2,14 @@
 # tasks file for openvpn
 
 - name: Create Server dirs and links
-  file:
+  file:                                                                         #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html
     path: "~/{{ item }}"
     state: directory
   loop:
     - "{{ CERT_ROOT_DIR }}"
 
 - name: Get Server template
-  template:
+  template:                                                                     #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html
     src: "{{ item.name }}.j2" 
     dest: "{{ item.path }}"
   loop:
@@ -17,20 +17,20 @@
     - { name: "vars", path: "~/{{ CERT_ROOT_DIR }}/vars"}
 
 - name: Build PKI
-  command: "/usr/share/easy-rsa/easyrsa init-pki"
+  command: "/usr/share/easy-rsa/easyrsa init-pki"                              #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
 - name: "Build CA"
   become: yes
-  shell: >
+  shell: >                                                                     #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
     yes "" | /usr/share/easy-rsa/easyrsa build-ca nopass;
   args: 
     chdir: "~/{{ CERT_ROOT_DIR }}"
     executable: /bin/bash
 
 - name: Build DH
-  command: "/usr/share/easy-rsa/easyrsa gen-dh"
+  command: "/usr/share/easy-rsa/easyrsa gen-dh"                                #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
@@ -40,17 +40,17 @@
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
 - name: Build TA
-  command: "openvpn --genkey --secret ta.key"
+  command: "openvpn --genkey --secret ta.key"                                 #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
 - name: Build certificate server
-  command: "/usr/share/easy-rsa/easyrsa build-server-full server nopass"
+  command: "/usr/share/easy-rsa/easyrsa build-server-full server nopass"      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
 - name: Copy server.key, server.crt, ca.crt, dh.pem, ta.key
-  copy:
+  copy:                                                                       #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/copy_module.html
     src: "~/{{ CERT_ROOT_DIR }}/{{ item.path }}/{{ item.name }}"
     dest: "/etc/openvpn/{{ item.name }}"
     remote_src: yes  
@@ -61,3 +61,27 @@
     - { name: "crl.pem", path: "pki"}
     - { name: "dh.pem", path: "pki"}
     - { name: "ta.key", path: "."}
+
+- name: Forward network packages
+  shell: sysctl -w net.ipv4.ip_forward=1                                      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+
+- name: Allow OpenSSH rule
+  ufw:                                                                        #https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html
+    rule: allow
+    name: OpenSSH
+
+- name: Allow OpenVPN rule
+  ufw:                                                                        #https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html
+    rule: allow
+    port: openvpn
+    comment: "OpenVPN"
+
+- name: Allow everything and enable UFW
+  ufw:                                                                        #https://docs.ansible.com/ansible/latest/collections/community/general/ufw_module.html
+    state: enabled
+    policy: allow
+
+- name: Added rules Firewall                                                  #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html       
+  shell: iptables -I FORWARD -i tun0 -o eth0 -j ACCEPT \                    
+          iptables -I FORWARD -i eth0 -o tun0 -j ACCEPT \
+          iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
