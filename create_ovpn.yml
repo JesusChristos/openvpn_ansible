@@ -1,0 +1,6 @@
+- name: Create OpenVPN config
+  hosts: all
+  become: true
+  gather_facts: false
+  roles:
+    - role: create_ovpn
