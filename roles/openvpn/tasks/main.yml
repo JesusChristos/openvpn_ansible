@@ -1,49 +1,14 @@
 ---
 # tasks file for openvpn
 
-- name: Update apt repo and cache on Ubuntu VM
-  apt:                                                                          #https://docs.ansible.com/ansible/2.9/modules/apt_module.html
-    state: latest                                                                            
-    update_cache: yes
-    force_apt_get: yes
-    cache_valid_time: 3600
-
-- name: Install packages
-  apt:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - openvpn
-    - mc
-    - htop
-  register: test
-
-- name: Create a directory easy-rsa
-  file:
-    path: "{{ PATH_EASY_RSA }}"
-    state: directory
-    mode: '0755'
-
-- name: Download EasyRSA-3.0.4
-  get_url:
-    url: https://github.com/OpenVPN/easy-rsa/releases/download/v3.0.4/EasyRSA-3.0.4.tgz
-    dest: "{{ PATH_EASY_RSA }}"
-
-
-- name: Extract EasyRSA into PATH_EASY_RSA
-  unarchive:
-    src: "{{ PATH_EASY_RSA }}/EasyRSA-3.0.4.tgz"
-    dest: "{{ PATH_EASY_RSA }}"
-    remote_src: yes
-
-- name: Create dirs and links
+- name: Create Server dirs and links
   file:
     path: "~/{{ item }}"
     state: directory
   loop:
     - "{{ CERT_ROOT_DIR }}"
 
-- name: Get template
+- name: Get Server template
   template:
     src: "{{ item.name }}.j2" 
     dest: "{{ item.path }}"
@@ -52,123 +17,47 @@
     - { name: "vars", path: "~/{{ CERT_ROOT_DIR }}/vars"}
 
 - name: Build PKI
-  command: "/usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa init-pki"
+  command: "/usr/share/easy-rsa/easyrsa init-pki"
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
-- name: "Build the CA"
+- name: "Build CA"
   become: yes
   shell: >
-    yes "" | /usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa build-ca nopass;
+    yes "" | /usr/share/easy-rsa/easyrsa build-ca nopass;
   args: 
     chdir: "~/{{ CERT_ROOT_DIR }}"
     executable: /bin/bash
 
-- name: Build Gen-Reg
-  shell: > 
-    yes "" | /usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa gen-req server nopass
-  args:
-    chdir: "~/{{ CERT_ROOT_DIR }}"
-
-- name: Copy server.key
-  copy:
-    src: "~/{{ CERT_ROOT_DIR }}/pki/private/server.key"
-    dest: "/etc/openvpn/server.key"
-    remote_src: yes
-
-- name: "Build the server.crt"
-  become: yes
-  shell: |
-    bash << EOF
-    /usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa sign-req server server
-    yes
-    EOF
-  args: 
-    chdir: "~/{{ CERT_ROOT_DIR }}"
-    executable: /bin/bash
-
-- name: Copy server.key
-  copy:
-    src: "~/{{ CERT_ROOT_DIR }}/{{ item.path }}/{{ item.name }}"
-    dest: "/etc/openvpn/{{ item.name }}"
-    remote_src: yes  
-  loop:
-    - { name: "server.crt", path: "pki/issued"}
-    - { name: "ca.crt", path: "pki"}
-    
 - name: Build DH
-  command: "/usr/share/easy-rsa/EasyRSA-3.0.4/easyrsa gen-dh"
+  command: "/usr/share/easy-rsa/easyrsa gen-dh"
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
-- name: Copy DH to /etc/openvpn
-  copy:
-    src: "~/{{ CERT_ROOT_DIR }}/pki/dh.pem"
-    dest: "/etc/openvpn/dh.pem"
-    remote_src: yes
+- name: Build PEM key
+  command: "/usr/share/easy-rsa/easyrsa gen-crl"
+  args:
+    chdir: "~/{{ CERT_ROOT_DIR }}"
 
 - name: Build TA
   command: "openvpn --genkey --secret ta.key"
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
-- name: Copy TA to /etc/openvpn
+- name: Build certificate server
+  command: "/usr/share/easy-rsa/easyrsa build-server-full server nopass"
+  args:
+    chdir: "~/{{ CERT_ROOT_DIR }}"
+
+- name: Copy server.key, server.crt, ca.crt, dh.pem, ta.key
   copy:
-    src: "~/{{ CERT_ROOT_DIR }}/ta.key"
-    dest: "/etc/openvpn/ta.key"
-    remote_src: yes
-
-- name: Uncomment the next line to enable packet forwarding for IPv4
-  lineinfile:
-    path: /etc/sysctl.conf
-    regexp: '^#net.ipv4.ip_forward=1'
-    line: net.ipv4.ip_forward=1
-
-- name: Reboot service
-  shell: sysctl -p
-
-- name: Allow OpenSSH rule
-  ufw:
-    rule: allow
-    name: OpenSSH
-
-
-- name: Allow OpenVPN rule
-  ufw:
-    rule: allow
-    port: openvpn
- 
-
-- name: Allow everything and enable UFW
-  ufw:
-    state: enabled
-    policy: allow
-
-- name: Uncomment the next line to enable packet forwarding for IPv4
-  lineinfile:
-    path: /etc/default/ufw
-    regexp: '^DEFAULT_FORWARD_POLICY="DROP"'
-    line: DEFAULT_FORWARD_POLICY="ACCEPT"
-
-- name: Added rules Firewall                                                 #Переробити нормально!
-  shell: |
-    ed /etc/ufw/before.rules << END
-    18i
-    *nat
-    :POSTROUTING ACCEPT [0:0]
-    -A POSTROUTING -s 10.8.0.0/8 -o eth0 -j MASQUERADE
-    .
-    w
-    q
-    END
-
-- name: Reloaded systemd / Restarted OpenVPN service
-  systemd:
-    daemon_reload: yes
-    name: openvpn 
-    state: restarted
-
-- name: Reloaded systemd
-  systemd:
-    name: openvpn 
-    state: started
+    src: "~/{{ CERT_ROOT_DIR }}/{{ item.path }}/{{ item.name }}"
+    dest: "/etc/openvpn/{{ item.name }}"
+    remote_src: yes  
+  loop:
+    - { name: "server.crt", path: "pki/issued"}
+    - { name: "server.key", path: "pki/private"}
+    - { name: "ca.crt", path: "pki"}
+    - { name: "crl.pem", path: "pki"}
+    - { name: "dh.pem", path: "pki"}
+    - { name: "ta.key", path: "."}
