@@ -17,7 +17,8 @@
     - { name: "vars", path: "~/{{ CERT_ROOT_DIR }}/vars"}
 
 - name: Build PKI
-  command: "/usr/share/easy-rsa/easyrsa init-pki"                              #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
+  command: 
+    cmd: /usr/share/easy-rsa/easyrsa init-pki && export EASYRSA=$(pwd)                    #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
@@ -82,6 +83,18 @@
     policy: allow
 
 - name: Added rules Firewall                                                  #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html       
-  shell: iptables -I FORWARD -i tun0 -o eth0 -j ACCEPT \                    
-          iptables -I FORWARD -i eth0 -o tun0 -j ACCEPT \
+  shell: iptables -I FORWARD -i tun0 -o eth0 -j ACCEPT &&                    
+          iptables -I FORWARD -i eth0 -o tun0 -j ACCEPT &&
           iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+- name: Reloaded systemd / Restarted OpenVPN service
+  systemd:                                                                    #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
+    daemon_reload: yes
+    name: openvpn 
+    state: restarted
+
+- name: Reloaded systemd
+  systemd:                                                                    #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/systemd_module.html
+    name: openvpn 
+    state: started
+    enabled: yes

@@ -5,13 +5,25 @@
 #- debug:
 #    msg: "{{ this }}"
 
-- name: Create USERNAME_DIR
-  shell: mkdir $(whoami)
-  args:
-    chdir: "{{ USERNAME_DIR }}"
-  register: username
+#- name: Create USERNAME_DIR                                             #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+#  shell: mkdir $(whoami)
+#  args:
+#    chdir: "{{ USERNAME_DIR }}"
+  #register: username
 
-- name: Build certificate server
-  command: "/usr/share/easy-rsa/easyrsa build-client-full {{ username }} nopass"      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
-  args:
-    chdir: "{{ USERNAME_DIR }}"
+#- name: Build certificate client
+#  shell: /usr/share/easy-rsa/easyrsa build-client-full client nopass      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
+#  args:
+#    chdir: "{{ USERNAME_DIR }}"
+
+- name: Reloaded systemd / Restarted OpenVPN service
+  systemd:
+    daemon_reload: yes
+    name: openvpn 
+    state: restarted
+
+- name: Reloaded systemd
+  systemd:
+    name: openvpn 
+    state: started
+    enabled: yes
