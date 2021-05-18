@@ -6,7 +6,7 @@ or user/key provided creds.
 ---
 
 Command: ``
-ansible-playbook -i HOST_IP/HOST_DOMAIN, docker-swarm-provision.yml --tags provision
+ansible-playbook -i HOST_IP/HOST_DOMAIN, docker-swarm-provision.yml --tags provision --extra-args ansible_ssh_user=YOUR_USER --ask-pass
 ``
 
 ---
