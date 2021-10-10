@@ -1,22 +1,15 @@
-#Ansible plan:
-    Create role for Digitalocean
-        1. Connect to Digitalocen
-        2. Create droplet
-        3. Create users
-        4. Create openvpn server
-        5. Write configs
-        6. Connetc to vpn from local
-        7. Automation of sending ssh-key by email
+# This repo is configured for openvpn and docker-swarm provison
 
+#Docker swarm
+You can provision imutable docker node on every server, where you have user/password
+or user/key provided creds.
+---
 
-1) Навчитися видаляти дроплет на DigitalOcean!!!
+Command: ``
+ansible-playbook -i HOST_IP/HOST_DOMAIN, docker-swarm-provision.yml --tags provision --extra-args ansible_ssh_user=YOUR_USER --ask-pass
+``
 
-# Виклик ансібл плейбука
-
-ansible-playbook -i hosts playbook (якщо треба викликати для одного хоста тоді "-i ip," ) 
-
-# Киклик ad-hoc команди
-
-ansible -m ping -i hosts all (якщо для конкретного сервера "192.168.1.1,")
-
-pip3 install -r requirements.txt
+---
+<h3>``
+Please note that quote is mandatory or provide inventory file!
+``
