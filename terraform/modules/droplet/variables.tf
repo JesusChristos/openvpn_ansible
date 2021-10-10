@@ -9,7 +9,7 @@ variable "region" {
 
 variable "image_name" {
     type    = string
-    default = "ubuntu.20.04"
+    default = "ubuntu.16.04"
 }
 
 variable "name" {
