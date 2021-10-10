@@ -18,7 +18,7 @@
 
 - name: Build PKI
   command: 
-    cmd: /usr/share/easy-rsa/easyrsa init-pki && export EASYRSA=$(pwd)                    #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
+    cmd: /usr/share/easy-rsa/easyrsa init-pki                                 #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
   args:
     chdir: "~/{{ CERT_ROOT_DIR }}"
 
@@ -98,3 +98,24 @@
     name: openvpn 
     state: started
     enabled: yes
+
+
+######### Client 
+
+- name: Create USERNAME_DIR                                             #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  shell: mkdir $(whoami)
+  args:
+    chdir: "/etc/openvpn/client/"
+    warn: false
+
+- name: Whoami                                            #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  shell: whoami
+  register: USERNAME
+
+
+- name: Build certificate client
+  shell: /usr/share/easy-rsa/easyrsa build-client-full $(whoami) nopass && 
+          cp -r ~/{{ CERT_ROOT_DIR }}/pki/issued/$(whoami).crt /etc/openvpn/client/$(whoami) &&
+          cp -r ~/{{ CERT_ROOT_DIR }}/pki/private/$(whoami).key /etc/openvpn/client/$(whoami)    #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  args:
+    chdir: "{{ CERT_ROOT_DIR }}"

@@ -4,9 +4,8 @@
   shell: mkdir $(whoami)
   args:
     chdir: "{{ USERNAME_DIR }}"
-  register: username
 
 - name: Build certificate client
-  shell: /usr/share/easy-rsa/easyrsa build-client-full client nopass      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/command_module.html
+  shell: /usr/share/easy-rsa/easyrsa build-client-full client nopass      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
   args:
     chdir: "{{ USERNAME_DIR }}"

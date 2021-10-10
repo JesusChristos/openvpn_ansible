@@ -23,17 +23,17 @@ resource "digitalocean_droplet" "openvpn_master" {
 
 # Build SSH KEY 
 resource "tls_private_key" "droplet_ssh_key" {                                                  # https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs
-  algorithm = var.algorithm
-  rsa_bits  = var.rsa_bits
+  algorithm   = var.algorithm
+  rsa_bits    = var.rsa_bits
 }
 
-#Added ssh key to digitalocean
+# Added ssh key to digitalocean
 resource "digitalocean_ssh_key" "master_key" {
   name       = var.filename
   public_key = "${tls_private_key.droplet_ssh_key.public_key_openssh}"
 }
 
-#Write pem key to localfile
+# Write pem key to localfile
 resource "local_file" "private_key" {
     content         = "${tls_private_key.droplet_ssh_key.private_key_pem}"
     filename        = "${path.module}.${var.filename}"
