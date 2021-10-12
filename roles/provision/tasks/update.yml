@@ -18,3 +18,8 @@
     - openvpn
     - easy-rsa
     - mc
+    - net-tools
+
+- name: Reboot VM
+  reboot: 
+    reboot_timeout: 3600

@@ -1,6 +1,10 @@
 ---
 # tasks file for openvpn
 
+- name: IP Server
+  shell: "hostname -I  | cut -c 1- | cut -c -14"
+  register: this
+
 - name: Create Server dirs and links
   file:                                                                         #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html
     path: "~/{{ item }}"
@@ -14,6 +18,7 @@
     dest: "{{ item.path }}"
   loop:
     - { name: "server.conf", path: "/etc/openvpn/server.conf" }
+    - { name: "client.conf", path: "/etc/openvpn/client.conf" }
     - { name: "vars", path: "~/{{ CERT_ROOT_DIR }}/vars"}
 
 - name: Build PKI
@@ -63,6 +68,18 @@
     - { name: "dh.pem", path: "pki"}
     - { name: "ta.key", path: "."}
 
+- name: Changing Permissions to file server.key
+  ansible.builtin.file:
+    path: "/etc/openvpn/server.key"
+    mode: '0600'
+    remote_src: yes
+
+- name: Changing Permissions to file ta.key
+  ansible.builtin.file:
+    path: "/etc/openvpn/ta.key"
+    mode: '0600'
+    remote_src: yes
+
 - name: Forward network packages
   shell: sysctl -w net.ipv4.ip_forward=1                                      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
 
@@ -111,7 +128,6 @@
 - name: Whoami                                            #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
   shell: whoami
   register: USERNAME
-
 
 - name: Build certificate client
   shell: /usr/share/easy-rsa/easyrsa build-client-full $(whoami) nopass && 

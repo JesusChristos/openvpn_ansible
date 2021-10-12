@@ -5,10 +5,10 @@ ca {{ CA_CERT }}
 cert {{ SERVER_CERT }}
 key {{ SERVER_KEY }}
 dh {{ DH_CERT }}
-tls-auth {{ TLS_AUTH }}
+tls-crypt {{ TLS_CRYPT }}
 topology subnet
 server {{ INTERNAL_SUBNET }}
-ifconfig-pool-persist {{ CONNECTED_CLIENT_FILE }}
+#ifconfig-pool-persist {{ CONNECTED_CLIENT_FILE }}
 push "{{ PUSH_EXTRA_CONFIG }}"
 push "{{ PUSH_EXTRA_DNS_1 }}"
 push "{{ PUSH_EXTRA_DNS_2 }}"
@@ -23,3 +23,10 @@ verb {{ OPENVPN_VERB_LEVEL }}
 explicit-exit-notify {{ EXPLICIT_EXIT_NOTIFY }}
 log {{ OPENVPN_LOG }}
 auth {{ ALGORITHM_HMAC }}
+
+ncp-ciphers {{ CHIPER }}
+tls-version-min 1.2
+ignore-unknown-option block-outside-dns
+setenv opt block-outside-dns # Prevent Windows 10 DNS leak
+auth-gen-token 43200
+opt-verify #reject clients with mismatched settings
