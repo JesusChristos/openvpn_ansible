@@ -1,0 +1,26 @@
+---
+CONNECTION_PORT: 1194
+CONNECTION_PROTOCOL: udp4
+CONNECTION_INTERFACE: tun
+CA_CERT: /etc/openvpn/ca.crt
+SERVER_CERT: /etc/openvpn/server.crt
+SERVER_KEY: /etc/openvpn/server.key
+TLS_CRYPT: /etc/openvpn/ta.key 0 
+DH_CERT: /etc/openvpn/dh.pem
+INTERNAL_SUBNET: 10.8.0.0 255.255.255.0
+CONNECTED_CLIENT_FILE: /var/log/openvpn/ipp.txt
+PUSH_EXTRA_CONFIG: "redirect-gateway def1 bypass-dhcp"
+PUSH_EXTRA_DNS_1: "dhcp-option DNS 8.8.8.8"
+PUSH_EXTRA_DNS_2: "dhcp-option DNS 1.1.1.1"
+KEEPALIVE: 10 120
+CHIPER: AES-128-GCM
+OPENVPN_USER: nobody
+OPENVPN_GROUP: nogroup
+STATUS_LOG_FILE: /var/log/openvpn/openvpn-status.log
+OPENVPN_LOG: /var/log/openvpn/openvpn.log
+OPENVPN_VERB_LEVEL: 3
+EXPLICIT_EXIT_NOTIFY: 1
+CERT_ROOT_DIR: certificate_authority
+ALGORITHM_HMAC: SHA256
+
+

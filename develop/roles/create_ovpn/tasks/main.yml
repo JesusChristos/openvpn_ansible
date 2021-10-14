@@ -1,0 +1,11 @@
+---
+# tasks file for create_ovpn
+- name: Create USERNAME_DIR                                               #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  shell: mkdir $(whoami)
+  args:
+    chdir: "{{ USERNAME_DIR }}"
+
+- name: Build certificate client
+  shell: /usr/share/easy-rsa/easyrsa build-client-full client nopass      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  args:
+    chdir: "{{ USERNAME_DIR }}"
