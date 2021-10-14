@@ -1,8 +1,0 @@
----
-- name: create_droplet
-  include_tasks: create_droplet.yml
-  when: '"{{ DELETE_DROPLET }}" != "true"'
-
-- name: delete_droplet
-  include_tasks: delete_droplet.yml
-  when: '"{{ DELETE_DROPLET }}" == "true"'
