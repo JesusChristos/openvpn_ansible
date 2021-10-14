@@ -1,4 +1,0 @@
----
-# tasks file for node-docker-provision
-- include_tasks: docker-provision.yml
-  when: provision

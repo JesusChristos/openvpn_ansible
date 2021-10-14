@@ -1,4 +1,0 @@
----
-# defaults file for create_ovpn
-
-USERNAME_DIR: /etc/openvpn/client

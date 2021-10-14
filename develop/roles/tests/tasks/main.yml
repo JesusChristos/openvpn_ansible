@@ -1,7 +1,0 @@
----
-# tasks file for openvpn
-
-
-
-#- debug:
-#    msg: "{{ this }}"

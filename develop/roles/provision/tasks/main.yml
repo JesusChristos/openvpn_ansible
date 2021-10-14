@@ -1,2 +1,0 @@
-- name: Install update/upgrade
-  include_tasks: update.yml

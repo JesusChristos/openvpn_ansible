@@ -19,3 +19,5 @@ override.tf.json
 terraform.rc
 .tfvars
 terraform.tfvars
+*.ovpn
+droplet_master_key

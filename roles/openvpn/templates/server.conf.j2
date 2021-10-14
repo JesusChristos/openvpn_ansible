@@ -18,12 +18,12 @@ persist-key
 persist-tun
 duplicate-cn
 ncp-disable
+key-direction 0
 status {{ STATUS_LOG_FILE }}
 verb {{ OPENVPN_VERB_LEVEL }}
 explicit-exit-notify {{ EXPLICIT_EXIT_NOTIFY }}
 log {{ OPENVPN_LOG }}
 auth {{ ALGORITHM_HMAC }}
-
 ncp-ciphers {{ CHIPER }}
 tls-version-min 1.2
 ignore-unknown-option block-outside-dns
