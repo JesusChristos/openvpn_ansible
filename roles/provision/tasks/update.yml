@@ -2,13 +2,12 @@
   apt:                                                                                              #https://docs.ansible.com/ansible/2.9/modules/apt_module.html
     state: latest                                                                            
     update_cache: yes
-    force_apt_get: yes
     cache_valid_time: 3600
 
 - name: Upgrade all packages on VM
   apt: 
     upgrade: dist
-    force_apt_get: yes
+    update_cache: yes
 
 - name: Install packages
   apt:

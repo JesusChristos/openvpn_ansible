@@ -1,11 +1,36 @@
----
-# tasks file for create_ovpn
-- name: Create USERNAME_DIR                                               #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+######### Create client .ovpn config
+
+- name: Create USERNAME_DIR                                             #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
   shell: mkdir $(whoami)
   args:
-    chdir: "{{ USERNAME_DIR }}"
+    chdir: "/etc/openvpn/client/"
+    warn: false
 
-- name: Build certificate client
-  shell: /usr/share/easy-rsa/easyrsa build-client-full client nopass      #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+- name: Whoami                                                          #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  shell: whoami
+  register: USERNAME
+
+- name: Build certificate client                                        #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  shell: /usr/share/easy-rsa/easyrsa build-client-full $(whoami) nopass && 
+          cp -r ~/{{ CERT_ROOT_DIR }}/pki/issued/$(whoami).crt /etc/openvpn/client/$(whoami) &&
+          cp -r ~/{{ CERT_ROOT_DIR }}/pki/private/$(whoami).key /etc/openvpn/client/$(whoami)
   args:
-    chdir: "{{ USERNAME_DIR }}"
+    chdir: "{{ CERT_ROOT_DIR }}"
+
+
+- name: "Create client ovpn file"
+  become: yes
+  shell: "{{ item }}"                                                   #https://docs.ansible.com/ansible/latest/collections/ansible/builtin/shell_module.html
+  with_items:
+    - echo -e '<ca>' >> /etc/openvpn/client.ovpn
+    - cat /etc/openvpn/ca.crt >> /etc/openvpn/client.ovpn
+    - echo -e '</ca>\n<cert>' >> /etc/openvpn/client.ovpn
+    - cat /etc/openvpn/client/$(whoami)/$(whoami).crt >> /etc/openvpn/client.ovpn
+    - echo -e '</cert>\n<key>' >> /etc/openvpn/client.ovpn
+    - cat /etc/openvpn/client/$(whoami)/$(whoami).key >> /etc/openvpn/client.ovpn
+    - echo -e '</key>\n<tls-crypt>' >> /etc/openvpn/client.ovpn
+    - cat /etc/openvpn/ta.key >> /etc/openvpn/client.ovpn
+    - echo -e '</tls-crypt>' >> /etc/openvpn/client.ovpn
+  args:
+    chdir: "/etc/openvpn/"
+    executable: /bin/bash
